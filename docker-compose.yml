@@ -13,13 +13,20 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./backend/db_init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d stokly"]
+      interval: 5s
+      retries: 5
+      start_period: 10s
 
   backend:
     build: ./backend
     container_name: stokly_backend
     restart: always
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       DATABASE_URL: postgresql+psycopg2://postgres:12345@db:5432/stokly
     ports:
