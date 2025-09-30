@@ -14,8 +14,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # Base para los modelos
 Base = declarative_base()
 
-
-# Dependencia para obtener sesión en cada request (si usas FastAPI, por ejemplo)
+# Dependencia para obtener sesión en cada request
 def get_db():
     db = SessionLocal()
     try:
