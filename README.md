@@ -93,6 +93,16 @@ npm run dev
 
 ---
 
+## Documentación de la API
+
+La documentación de esta API se genera automáticamente gracias a FastAPI, utilizando Swagger UI.
+
+Para acceder a ella, simplemente ejecuta el servidor y se abre en el navegador:
+
+- http://localhost:8000/docs
+
+Ahí se podrá visualizar y probar todos los endpoints disponibles
+
 ## Notas importantes
 
 - Guardar los cambios antes de reconstruir los contenedores Docker  
