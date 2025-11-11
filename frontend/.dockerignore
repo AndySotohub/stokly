@@ -1,7 +1,33 @@
+
+# Node modules and build output
 node_modules
 dist
-.git
+
+# Vite / dev cache
+.vite
+.cache
+
+# Environment files
 .env
+.env.*
+
+# Git
+.git
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Docker and local configs
+Dockerfile*
+docker-compose*.yml
+
+# Tests / coverage
+coverage/
 
 
