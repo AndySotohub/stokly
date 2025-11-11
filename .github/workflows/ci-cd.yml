@@ -29,9 +29,9 @@ jobs:
         run: |
           pytest --maxfail=1 --disable-warnings -q
 
-      - name: 🐳 Construir imagen Docker
+      - name: Construir imagen Docker
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/stokly-backend:latest -f backend/src/Dockerfile backend/src
+          docker build -t "${{ secrets.DOCKERHUB_USERNAME }}/stokly-backend:latest" -f backend/src/Dockerfile backend/src
 
       - name: Loguearse en DockerHub
         run: |
