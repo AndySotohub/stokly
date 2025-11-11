@@ -2,6 +2,7 @@ version: "3.9"
 
 services:
   db:
+    # --- Servicio de la Base de Datos (Sin cambios) ---
     image: postgres:17
     container_name: stokly_db
     restart: always
@@ -21,7 +22,8 @@ services:
       start_period: 10s
 
   backend:
-    build: ./backend
+    image: mmolina07/stokly-backend:v1 
+    
     container_name: stokly_backend
     restart: always
     depends_on:
@@ -31,10 +33,6 @@ services:
       DATABASE_URL: postgresql+psycopg2://postgres:12345@db:5432/stokly
     ports:
       - "8000:8000"
-    volumes:
-      - ./backend:/app
-    working_dir: /app
-    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 
 volumes:
   postgres_data:
