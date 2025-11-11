@@ -1,0 +1,42 @@
+name: CI/CD Pipeline - Stokly Backend
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        working-directory: ./backend/src
+        run: |
+          pip install --no-cache-dir -r requirements.txt
+
+      - name: Ejecutar pruebas unitarias
+        working-directory: ./backend/src
+        env:
+          TESTING: "true"   # Para que use SQLite
+        run: |
+          pytest --maxfail=1 --disable-warnings -q
+
+      - name: Construir imagen Docker
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/stokly-backend:latest ./backend/src
+
+      - name: Loguearse en DockerHub
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Publicar imagen en DockerHub
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/stokly-backend:latest
