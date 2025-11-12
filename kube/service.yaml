@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: stokly-db
+  namespace: default
+  labels:
+    app: stokly-db
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+    name: postgres
+  selector:
+    app: stokly-db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stokly-backend
+  namespace: default
+  labels:
+    app: stokly-backend
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  selector:
+    app: stokly-backend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stokly-frontend
+  namespace: default
+  labels:
+    app: stokly-frontend
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  selector:
+    app: stokly-frontend
+

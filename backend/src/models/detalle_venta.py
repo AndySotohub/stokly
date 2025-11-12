@@ -1,0 +1,16 @@
+from sqlalchemy import Column, Integer, Numeric, ForeignKey
+from sqlalchemy.orm import relationship
+from src.database import Base
+
+class DetalleVenta(Base):
+    __tablename__ = "detalle_venta"
+    
+    id_detalle = Column(Integer, primary_key=True, index=True)
+    id_venta = Column(Integer, ForeignKey("venta.id_venta", ondelete="CASCADE"), nullable=False)
+    id_producto = Column(Integer, ForeignKey("producto.id_producto", ondelete="CASCADE"), nullable=False)
+    cantidad = Column(Integer, nullable=False)
+    precio_unitario = Column(Numeric(10, 2), nullable=False)
+    
+    venta = relationship("Venta", back_populates="detalles")
+    producto = relationship("Producto", back_populates="detalles_venta")
+

@@ -1,0 +1,161 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stokly-db
+  namespace: default
+  labels:
+    app: stokly-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stokly-db
+  template:
+    metadata:
+      labels:
+        app: stokly-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:17
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: stokly-secrets
+              key: postgres-user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: stokly-secrets
+              key: postgres-password
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: stokly-secrets
+              key: postgres-db
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+        - name: init-scripts
+          mountPath: /docker-entrypoint-initdb.d
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - postgres
+            - -d
+            - stokly
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - postgres
+            - -d
+            - stokly
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+      - name: init-scripts
+        configMap:
+          name: postgres-init-scripts
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stokly-backend
+  namespace: default
+  labels:
+    app: stokly-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: stokly-backend
+  template:
+    metadata:
+      labels:
+        app: stokly-backend
+    spec:
+      containers:
+      - name: backend
+        image: mmolina07/stokly-backend:v1
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: stokly-config
+              key: DATABASE_URL
+        livenessProbe:
+          httpGet:
+            path: /ping-db
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ping-db
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stokly-frontend
+  namespace: default
+  labels:
+    app: stokly-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: stokly-frontend
+  template:
+    metadata:
+      labels:
+        app: stokly-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: mmolina07/stokly-frontend:v1
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+

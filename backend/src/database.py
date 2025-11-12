@@ -9,9 +9,13 @@ POSTGRESQL_DATABASE_URL = "postgresql+psycopg2://postgres:12345@db:5432/stokly"
 SQLITE_DATABASE_URL = "sqlite:///./test.db"
 
 # Seleccionar la URL de la base de datos según el entorno
-DATABASE_URL = POSTGRESQL_DATABASE_URL
-if os.getenv("TESTING") == "true":
+# Prioridad: Variable de entorno > Testing > Default PostgreSQL
+if os.getenv("DATABASE_URL"):
+    DATABASE_URL = os.getenv("DATABASE_URL")
+elif os.getenv("TESTING") == "true":
     DATABASE_URL = SQLITE_DATABASE_URL
+else:
+    DATABASE_URL = POSTGRESQL_DATABASE_URL
 
 # Crear el motor de conexión
 engine = create_engine(DATABASE_URL, echo=True)

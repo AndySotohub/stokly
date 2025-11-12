@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stokly-config
+  namespace: default
+data:
+  DATABASE_URL: "postgresql+psycopg2://postgres:12345@stokly-db:5432/stokly"
+  POSTGRES_HOST: "stokly-db"
+  POSTGRES_PORT: "5432"
+

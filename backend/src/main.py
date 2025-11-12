@@ -1,23 +1,43 @@
 from fastapi import FastAPI, Depends
-from src.routers import items
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from src.database import Base, engine, get_db
 from sqlalchemy import text
-from src.models import item  
 
+# Importar todos los modelos para que se creen las tablas
+from src.models import (
+    Rol, Usuario, Categoria, Producto, 
+    Inventario, Venta, DetalleVenta
+)
 
-## Levantar server 'python3 -m uvicorn src.main:app --reload'
+# Importar routers
+from src.routers import categorias, productos, inventario, ventas
+
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Stokly - Control de Inventarios",
-    description="API para gestionar productos, entradas y salidas de inventario",
-    version="0.1.0",
+    description="API para gestionar productos, categorías, inventario y ventas",
+    version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
 )
-app.include_router(items.router)
+
+# Configurar CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Incluir routers
+app.include_router(categorias.router)
+app.include_router(productos.router)
+app.include_router(inventario.router)
+app.include_router(ventas.router)
 
 @app.get("/")
 def root():
