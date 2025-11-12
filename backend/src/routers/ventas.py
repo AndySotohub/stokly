@@ -9,6 +9,7 @@ from src.models.detalle_venta import DetalleVenta
 from src.models.inventario import Inventario
 from src.models.producto import Producto
 from src.schemas.venta import VentaCreate, VentaRead
+from src.metrics import ventas_totales_counter, ventas_monto_histogram
 
 router = APIRouter(prefix="/ventas", tags=["ventas"])
 
@@ -80,6 +81,11 @@ def create_venta(venta: VentaCreate, db: Session = Depends(get_db)):
     
     db.commit()
     db.refresh(db_venta)
+    
+    # Incrementar contador de ventas y registrar monto
+    ventas_totales_counter.inc()
+    ventas_monto_histogram.observe(float(db_venta.total))
+    
     return db_venta
 
 @router.get("/{venta_id}", response_model=VentaRead)

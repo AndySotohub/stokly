@@ -124,6 +124,17 @@ kubectl get events --sort-by='.lastTimestamp'
 # Verificar conectividad del backend a la base de datos
 kubectl exec -it deployment/stokly-backend -- curl http://localhost:8000/ping-db
 ```
+# Verificar prometheus y metricas
+
+curl http://localhost:8000/
+curl http://localhost:8000/docs
+curl http://localhost:8000/metrics
+
+- Comando para UI de prometheus
+
+kubectl port-forward svc/prometheus 9090:9090 &
+open http://localhost:9090
+
 
 ### Estado esperado
 

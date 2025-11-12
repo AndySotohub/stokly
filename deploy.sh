@@ -4,7 +4,7 @@
 
 set -e
 
-echo "🚀 Desplegando Stokly..."
+echo "Desplegando Stokly..."
 
 # Verificar que minikube esté corriendo
 if ! minikube status &> /dev/null; then
@@ -53,7 +53,7 @@ fi
 docker build -t mmolina07/stokly-frontend:v1 . --quiet
 
 # Aplicar manifiestos
-echo "Aplicando manifiestos..."
+echo "📦 Aplicando manifiestos..."
 cd /Users/mateomolina/Documents/stokly/stokly
 kubectl apply -f kube/secret.yaml
 kubectl apply -f kube/configmap.yaml
@@ -61,12 +61,14 @@ kubectl apply -f kube/postgres-init-configmap.yaml
 kubectl apply -f kube/pvc.yaml
 kubectl apply -f kube/deployment.yaml
 kubectl apply -f kube/service.yaml
+kubectl apply -f kube/prometheus.yaml
 
 # Esperar a que los pods estén listos
 echo "⏳ Esperando a que los pods estén listos..."
 kubectl wait --for=condition=ready pod -l app=stokly-db --timeout=120s || true
 kubectl wait --for=condition=ready pod -l app=stokly-backend --timeout=120s || true
 kubectl wait --for=condition=ready pod -l app=stokly-frontend --timeout=120s || true
+kubectl wait --for=condition=ready pod -l app=prometheus --timeout=120s || true
 
 echo ""
 echo "¡Despliegue completado!"
@@ -77,15 +79,20 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 if pgrep -f "minikube tunnel" > /dev/null; then
-    echo "Frontend:  $FRONTEND_URL"
-    echo "Backend:   $BACKEND_URL"
-    echo "API Docs:  $BACKEND_URL/docs"
+    echo "Frontend:   $FRONTEND_URL"
+    echo "Backend:    $BACKEND_URL"
+    echo "API Docs:   $BACKEND_URL/docs"
+    echo "Métricas:   $BACKEND_URL/metrics"
+    echo "Prometheus: http://localhost:9090"
     echo ""
     echo "✓ Túnel activo - accede directamente a localhost"
 else
-    echo "Frontend:  $FRONTEND_URL"
-    echo "Backend:   $BACKEND_URL"
-    echo "API Docs:  $BACKEND_URL/docs"
+    PROMETHEUS_URL="http://${MINIKUBE_IP}:30090"
+    echo "Frontend:   $FRONTEND_URL"
+    echo "Backend:    $BACKEND_URL"
+    echo "API Docs:   $BACKEND_URL/docs"
+    echo "Métricas:   $BACKEND_URL/metrics"
+    echo "Prometheus: $PROMETHEUS_URL"
     echo ""
     echo " Para usar localhost, ejecuta en otra terminal:"
     echo "   sudo minikube tunnel"

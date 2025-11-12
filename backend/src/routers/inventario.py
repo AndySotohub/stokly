@@ -6,12 +6,20 @@ from src.database import get_db
 from src.models.inventario import Inventario
 from src.models.producto import Producto
 from src.schemas.inventario import InventarioCreate, InventarioRead, InventarioUpdate
+from src.metrics import productos_stock_bajo_gauge
 
 router = APIRouter(prefix="/inventario", tags=["inventario"])
 
 @router.get("/", response_model=List[InventarioRead])
 def get_inventario(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     inventario = db.query(Inventario).offset(skip).limit(limit).all()
+    
+    # Actualizar métrica de productos con stock bajo
+    stock_bajo_count = db.query(Inventario).filter(
+        Inventario.stock_actual <= Inventario.stock_minimo
+    ).count()
+    productos_stock_bajo_gauge.set(stock_bajo_count)
+    
     return inventario
 
 @router.get("/stock-bajo", response_model=List[InventarioRead])
