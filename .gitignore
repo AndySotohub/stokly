@@ -4,3 +4,4 @@ __pycache__/
 node_modules/
 :python_env/
 test.db
+.venv/

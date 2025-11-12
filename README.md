@@ -86,6 +86,11 @@ npm install  # Instalar dependencias si es necesario
 docker build -t mmolina07/stokly-frontend:v1 .
 ```
 
+### Links de dockerhub
+
+- Imagen de backend: https://hub.docker.com/r/mmolina0721/stokly-backend
+- Imagen de frontend: https://hub.docker.com/r/dubinasoto9/stokly-frontend
+
 O usar el script de rebuild:
 
 ```bash

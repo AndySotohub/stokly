@@ -23,10 +23,11 @@ metadata:
   labels:
     app: stokly-backend
 spec:
-  type: LoadBalancer
+  type: NodePort
   ports:
   - port: 8000
     targetPort: 8000
+    nodePort: 30080
     protocol: TCP
     name: http
   selector:
@@ -40,10 +41,11 @@ metadata:
   labels:
     app: stokly-frontend
 spec:
-  type: LoadBalancer
+  type: NodePort
   ports:
   - port: 80
     targetPort: 80
+    nodePort: 30081
     protocol: TCP
     name: http
   selector:
